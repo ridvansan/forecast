@@ -74,3 +74,38 @@ extern "C" void __construct_array(void* start, ArrayElementFunc ctor, ArrayEleme
         object += size;
     }
 }
+
+// Destroys count elements of an array, last element first
+extern "C" void __destroy_arr(void* start, ArrayElementFunc dtor, size_t size, size_t count) {
+    char* object = (char*)start + size * count;
+
+    while (count != 0) {
+        object -= size;
+        dtor(object, -1);
+        count--;
+    }
+}
+
+// Implements delete[] for arrays of class objects: destroys the elements (last first), using
+// the size and count stored in the header, then frees the whole allocation
+extern "C" void __destroy_new_array(void* elements, ArrayElementFunc dtor) {
+    if (elements != NULL) {
+        if (dtor != NULL) {
+            size_t i;
+            size_t count;
+            size_t size;
+            char* object;
+
+            size = ((size_t*)((char*)elements - NEW_ARRAY_HEADER_SIZE))[0];
+            count = ((size_t*)((char*)elements - NEW_ARRAY_HEADER_SIZE))[1];
+            object = (char*)elements + size * count;
+
+            for (i = 0; i < count; i++) {
+                object -= size;
+                dtor(object, -1);
+            }
+        }
+
+        operator delete[]((char*)elements - NEW_ARRAY_HEADER_SIZE);
+    }
+}
