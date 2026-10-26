@@ -1133,7 +1133,7 @@ config.libs = [
                 Object(Matching, "GlobeView.cpp"),
                 Object(Matching, "SceneBase.cpp", extra_cflags=["-ipa file"]),
                 Object(Matching, "SimpleGlobe.cpp", extra_cflags=["-ipa file"]),
-                Object(NonMatching, "GlobeDotsTable.cpp"),
+                Object(Matching, "GlobeDotsTable.cpp"),
             ],
     },
     {
